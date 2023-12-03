@@ -1,10 +1,10 @@
 const mysql = require("mysql");
 function handleDisconnect() {
   connection = mysql.createConnection({
-    host: "bynz8ffsh8hxzo6i79rp-mysql.services.clever-cloud.com",
-    user: "uimqgwitzguanugd",
-    password: "BhTGse6vgRW24QoNey19",
-    database: "bynz8ffsh8hxzo6i79rp",
+    host: "be6vnsardwnhrd2kvuon-mysql.services.clever-cloud.com",
+    user: "us5h2edrx3zrgjdf",
+    password: "oeOBpFoM6PJsH5ZR34xH",
+    database: "be6vnsardwnhrd2kvuon",
     port: "3306",
   });
   connection.connect((err) => {

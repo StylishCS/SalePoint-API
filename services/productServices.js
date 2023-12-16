@@ -24,12 +24,38 @@ async function getProducts() {
 async function getProductById(id) {
   try {
     const query = util.promisify(connection.query).bind(connection);
-    const products = await query("SELECT * FROM products WHERE id = ?", id);
+    const products = await query("SELECT * FROM products WHERE id = ?", [id]);
     return products;
   } catch (error) {
     console.error(error);
   }
 }
 
+async function deleteProd(id){
+  try {
+    const query = util.promisify(connection.query).bind(connection);
+    const product = await query("DELETE FROM products WHERE id = ?", [id]);
+    return product;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-module.exports = { addProduct, getProducts, getProductById };
+async function updateProd(id, data){
+  try {
+    const query = util.promisify(connection.query).bind(connection);
+    const product = await query("UPDATE products SET ? WHERE id = ?", [data, id]);
+    return product;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+module.exports = {
+  addProduct,
+  getProducts,
+  getProductById,
+  deleteProd,
+  updateProd,
+};

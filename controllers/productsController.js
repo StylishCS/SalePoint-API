@@ -3,6 +3,8 @@ const {
   addProduct,
   getProductById,
   getProducts,
+  updateProd,
+  deleteProd
 } = require("../services/productServices");
 const cloudinary = require("../utils/cloudinary");
 const streamifier = require("streamifier");
@@ -75,8 +77,37 @@ async function getProductByIdController(req, res) {
   }
 }
 
+async function updateProductController(req, res) {
+  try {
+    let product = await getProductById(req.params.id);
+    if (!product[0]) return res.status(404).json("NO DATA FOUND");
+    product[0].name = req.body.name;
+    product[0].netPrice = req.body.netPrice;
+    product[0].sellPrice = req.body.sellPrice;
+    product[0].stock = req.body.stock;
+    product[0].category = req.body.category;
+    await updateProd(product[0].id,product[0]);
+    return res.status(200).json(product[0]);
+  } catch (error) {
+    return res.status(500).json("INTERNAL SERVER ERROR");
+  }
+}
+
+async function deleteProductController(req, res) {
+  try {
+    const product = await getProductById(req.params.id);
+    if (!product[0]) return res.status(404).json("NO DATA FOUND");
+    await deleteProd(product[0].id);
+    return res.status(200).json("DELETED SUCCESSFULLY");
+  } catch (error) {
+    return res.status(500).json("INTERNAL SERVER ERROR");
+  }
+}
+
 module.exports = {
   addProductController,
   allProductsController,
   getProductByIdController,
+  updateProductController,
+  deleteProductController,
 };

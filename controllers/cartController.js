@@ -33,7 +33,6 @@ async function checkout(req, res) {
     await Promise.all(promises);
     totalSellPrice -= req.body.Details.Discount;
     profit = totalSellPrice - totalNetPrice;
-    console.log(totalSellPrice);
     let details = {
       customerName: req.body.Details.CustomerName,
       customerPhone: req.body.Details.CustomerPhone,
@@ -43,8 +42,6 @@ async function checkout(req, res) {
       profit: profit,
       id: nanoid(10),
     };
-    ///////////////////////////////////////////////////////////
-    //console.log(products);
     let obj = [];
 
     products.forEach((prod) => {
@@ -55,7 +52,6 @@ async function checkout(req, res) {
         "tax-rate": 0,
       });
     });
-    console.log(obj);
     let imgPath = path.resolve("images", "invoice.png");
     function base64_encode(file) {
       let png = fs.readFileSync(imgPath);
@@ -91,64 +87,16 @@ async function checkout(req, res) {
         address: "Customer Phone Number: ",
       },
     };
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    async function convertPDFtoImage(pdfFilePath) {
-      const options = {
-        density: 100, // Output image density (DPI)
-        saveFilename: "output", // Output file name (without extension)
-        savePath: "./images/", // Output directory
-        format: "png", // Output format (png, jpeg, etc.)
-        width: 800, // Output width
-        height: 600, // Output height
-      };
-
-      const pdfConverter = new pdf2pic(options);
-      return pdfConverter.convert(pdfFilePath, 1); // Convert the first page of the PDF
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     const invoicePdf = async () => {
       let result = await easyinvoice.createInvoice(data);
-      let streamUpload = (req) => {
-        return new Promise((resolve, reject) => {
-          let stream = cloudinary.uploader.upload_stream(
-            {
-              resource_type: "auto", // Specify resource type as "raw" for PDF
-            },
-            (error, result) => {
-              if (result) {
-                resolve(result);
-              } else {
-                reject(error);
-              }
-            }
-          );
-          streamifier.createReadStream(result.pdf).pipe(stream);
-        });
-      };
-      let cloudResult = await streamUpload(req);
-      let imageUrl = cloudinary.url(cloudResult.public_id);
-      console.log(imageUrl);
-      return imageUrl;
+      fs.writeFileSync(
+        `./public/${details.id}.pdf`,
+        result.pdf,
+        "base64"
+      );
     };
-
-    // const invoicePdf = async () => {
-    //   let result = await easyinvoice.createInvoice(data);
-    //   fs.writeFileSync(
-    //     `./invoice/invoice${Date.now()}.pdf`,
-    //     result.pdf,
-    //     "base64"
-    //   );
-    // };
-    invoicePdf()
-      .then(async (url) => {
-        //upload invoice to cloudinary
-        details.invoiceView = url;
-        let invoice = await createInvoice(details, products);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    ///////////////////////////////////////////////////////////
+    invoicePdf();
+    await createInvoice(details, products);
     return res.status(200).send("ok");
   } catch (error) {
     console.log(error);

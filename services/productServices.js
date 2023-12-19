@@ -51,6 +51,15 @@ async function updateProd(id, data){
   }
 }
 
+// async function updateStock(id, data){
+//   try {
+//     const query = util.promisify(connection.query).bind(connection);
+//     const product = await query("UPDATE products SET ? WHERE id = ?", [data, id]);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 
 module.exports = {
   addProduct,
